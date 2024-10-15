@@ -1,0 +1,55 @@
+# some default settings
+echo both
+units metal
+boundary p p p
+newton on
+atom_style atomic
+neighbor 1.0 bin
+neigh_modify every 1 delay 5 check yes
+thermo 10000
+
+# create lattice
+lattice bcc 2.86506 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region box block 0 10 0 10 0 5
+create_box 2 box
+create_atoms 1 box
+
+# force field
+pair_style eam/alloy
+pair_coeff * * FeCr.eam.alloy Fe Cr
+
+# composition
+set group all type 1
+set type 1 type/ratio 2 0.07 749847
+
+# insert defect of a given type
+create_atoms 1 random 1 123456 NULL overlap 0.5 maxtry 50 units box
+
+# zero pressure minimization
+min_style cg
+min_modify dmax 1.0e-2 line quadratic
+fix min all box/relax iso 0.0 vmax 0.01
+minimize 0.0 1.0e-4 10000 10000
+unfix min
+
+# initialize velocities
+velocity all create 1000 123456 dist gaussian
+velocity all zero linear
+velocity all zero angular
+
+# equilibrate with NPT dynamics
+# fix recenter_fix all recenter INIT INIT INIT
+fix lgv_fix all langevin 1000 1000 0.1 123456 gjf vhalf
+fix nve_fix all nve
+fix press_fix all press/berendsen iso 0.0 0.0 1.0 modulus 1400000
+run 100000
+unfix press_fix
+
+# equilibrate with NVT dynamics
+run 10000
+
+# do main run
+reset_timestep 0
+dump transport_dump all custom 500000 interstitial.dump id type x y z
+run 100000000
+

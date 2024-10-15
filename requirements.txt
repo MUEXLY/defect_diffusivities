@@ -1,0 +1,4 @@
+git+https://github.com/MUEXLY/add_pd
+numpy
+ovito
+matplotlib
