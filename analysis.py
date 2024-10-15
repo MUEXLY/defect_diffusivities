@@ -108,7 +108,11 @@ def vacancy():
     # plot results
     msd = msd_fft_cross(displacement, displacement)
     plt.plot(time, msd)
-    plt.savefig("v.png")
+    plt.xlabel("time")
+    plt.ylabel("mean square displacement")
+    plt.grid()
+    plt.savefig("plots/vacancy.pdf")
+    plt.close()
 
 
 def interstitial():
@@ -137,7 +141,11 @@ def interstitial():
 
     msd = msd_fft_cross(displacement, displacement)
     plt.plot(time, msd)
-    plt.savefig("i.png")
+    plt.xlabel("time")
+    plt.ylabel("mean square displacement")
+    plt.grid()
+    plt.savefig("plots/interstitial.pdf")
+    plt.close()
 
 
 if __name__ == "__main__":
